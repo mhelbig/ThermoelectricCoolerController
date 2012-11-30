@@ -1,0 +1,1 @@
+This is an Arduino based controller for a portable thermoelectric cooler to regulate the internal temperature.  It also provides a defrost mode to free the cooling fins inside the cooler from frost that accumulates as the cooler runs.
