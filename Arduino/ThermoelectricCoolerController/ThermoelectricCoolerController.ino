@@ -8,7 +8,7 @@ const float FrostFormingTemp = 40;               // Temperature where frost begi
 const float FrostMeltedTemp = 43;                // Temperature where frost has melted off during the defrost cycle
 
 const unsigned long EventInterval = 60;          // Send event string every 60 seconds
-const unsigned long FrostBuildupLimit = 240;     // Minutes of frost buildup before defrosting starts (24hr = 1440)
+const unsigned long FrostBuildupLimit = 1440;    // Minutes of frost buildup before defrosting starts (24hr = 1440)
 const unsigned long DefrostRecoveryTime = 10;    // Minutes Defrost LED flashes code 12 after defrost mode ends
 
 // Variables:
@@ -19,7 +19,7 @@ int CoolerState =1;                              // Current Cooler operational s
 int LEDblinkCode;                                // 2 digit blink code for the LED
 unsigned long FrostBuildup = 0;                  // Accumulated minutes of frost buildup
 unsigned long PostDefrostTime = 0;               // Minutes elapsed after defrost cycle completes
-unsigned long EventLogTimer;                     // Event data Timer (in seconds) for serial output interval
+unsigned long EventLogTimer=0;                   // Event data Timer (in seconds) for serial output interval
 
 // I/O Ports:
 const int BatteryVoltage = 0;
@@ -121,14 +121,14 @@ void loop()
 
 void ReadTemperature(void)
 {
-/*
-  if (Serial.available())
+/*  if (Serial.available())
   {
     tempF = float(Serial.read());
   }
 */
+  
   sensors.requestTemperatures();
-  tempF = DallasTemperature::toFahrenheit(sensors.getTempC(insideThermometer));
+  tempF = DallasTemperature::toFahrenheit(sensors.getTempC(CoolerThermometer));
 
   // Bounds check the temperature and set any temperature related error codes
   if(tempF > 99)
@@ -225,7 +225,7 @@ int MinuteTick(int Command)
 {
   static unsigned long RolloverSeconds;
 
-  if (Command == 0)                    // Command of 0 means rest the counter to start a new minute
+  if (Command == 0)                    // Command of 0 means reset the counter to start a new minute
   {
     RolloverSeconds = Seconds() + 60;
     return (0);
@@ -236,11 +236,14 @@ int MinuteTick(int Command)
     RolloverSeconds += 60;
     return (1);
   }
+  
+  else return (0);
+  
 }
 
 unsigned long Seconds(void)
 {
-  return millis()/1000;
+  return (millis()/1000);
 }
 
 void SetLED(bool State)
