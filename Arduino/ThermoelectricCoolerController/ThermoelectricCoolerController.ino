@@ -254,7 +254,7 @@ void SetLED(bool State)
 
 void SetPeltier(bool State)
 {
-  if(State == HIGH) analogWrite(Peltier, 127);
+  if(State == HIGH) analogWrite(Peltier, 192);
   else analogWrite(Peltier, 0);
 }
 
